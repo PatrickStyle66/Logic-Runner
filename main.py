@@ -281,7 +281,7 @@ def menu():
     run = True
     start = button((0,255,0),350,250,250,100,'Jogar')
     credit = button((0,255,0),350,400,250,100,'Créditos')
-    font = pygame.font.SysFont('minecrafteralt',100)
+    font = pygame.font.Font('Minecrafter.Alt.ttf',100)
     soundfont = pygame.font.SysFont('comicsans',30)
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))
     sound2 = soundfont.render('Som(M):Off',1,(255,255,255))
