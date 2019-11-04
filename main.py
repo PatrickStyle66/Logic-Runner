@@ -202,6 +202,14 @@ def creditScreen():
         win.blit(copyright,(650,550))
         win.blit(music,(50,550))
 
+
+def logicfun(logicup):
+    return win.blit(logicup, (W / 2 - logicup.get_width() / 2, 550))
+def dummyfun(dummyup):
+    return win.blit(dummyup, (W / 2 - dummyup.get_width() / 2, 550))
+def baldufun(baldup):
+    return win.blit(baldup, (W / 2 - baldup.get_width() / 2, 550))
+
 def player_choose():
     global runner
     logic_im = pygame.image.load(os.path.join('images','S5.png'))
@@ -220,8 +228,11 @@ def player_choose():
     baldutxt = runfont.render('Baldu',1,(255,255,255))
     blank = runfont.render('',1,(255,255,255))
     logicup = runfont.render('PowerUp: ainda nsei kkk',1,(255,255,255))
-    dummyup = runfont.render('PowerUp: Destroi obstaculos ao serem tocados',1,(255,255,255))
-    baldup= runfont.render('PowerUp: Transforma os obstaculos em printf, os tornando insignificantes',1,(255,255,255))
+    dummyup = runfont.render('PowerUp: Destrói obstáculos ao serem tocados',1,(255,255,255))
+    baldup= runfont.render('PowerUp: Transforma os obstáculos em printf, os tornando insignificantes',1,(255,255,255))
+    global power
+    power = dummyfun
+    param = dummyup
     while run:
         pygame.time.delay(100)
         logic.draw(win,(0,0,0))
@@ -229,43 +240,49 @@ def player_choose():
         baldu.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
+
             pos = pygame.mouse.get_pos()
 
             if logic.isOver(pos):
                 logic = button((0, 255, 0), 200, 150, 150, 300, '', 5)
                 logic.draw(win, (0, 0, 0))
                 logic_im = pygame.image.load(os.path.join('images', '4.png'))
-                power = 1
+                power = logicfun
+                param = logicup
                 pygame.display.update()
             else:
                 logic = button((255, 255, 255), 200, 150, 150, 300, '', 5)
                 logic.draw(win, (0, 0, 0))
                 logic_im = pygame.image.load(os.path.join('images', 'S5.png'))
-                power = 0
+                win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
                 pygame.display.update()
 
             if dummy.isOver(pos):
                 dummy = button((0, 255, 0), 400, 150, 150, 300, '', 5)
                 dummy.draw(win, (0, 0, 0))
                 dummy_im = pygame.image.load(os.path.join('images', 'dummy4.png'))
-                power = 2
+                power = dummyfun
+                param = dummyup
                 pygame.display.update()
             else:
                 dummy = button((255, 255, 255), 400, 150, 150, 300, '', 5)
                 dummy.draw(win, (0, 0, 0))
                 dummy_im = pygame.image.load(os.path.join('images', 'dummyS5.png'))
-                power = 0
+
+                win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
                 pygame.display.update()
 
             if baldu.isOver(pos):
                 baldu = button((0, 255, 0), 600, 150, 150, 300, 'placeholder', 5,30,(255,255,255))
                 baldu.draw(win, (0, 0, 0))
-                power = 3
+                power = baldufun
+                param = baldup
                 pygame.display.update()
             else:
                 baldu = button((255, 255, 255), 600, 150, 150, 300, 'placeholder', 5,30,(255,255,255))
                 baldu.draw(win, (0, 0, 0))
-                power = 0
+
+                win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
                 pygame.display.update()
 
             if event.type == pygame.QUIT:
@@ -289,14 +306,7 @@ def player_choose():
         win.blit(logictxt,(logic.x + (logic.width / 2 - default.get_width() / 2),logic.y + 270 - default.get_height()))
         win.blit(dummytxt,(dummy.x + (dummy.width / 2 - default.get_width() / 2), dummy.y + 270 - default.get_height()))
         win.blit(baldutxt,(baldu.x + (baldu.width / 2 - default.get_width() / 2), baldu.y + 270 - default.get_height()))
-        if power == 0:
-            win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
-        elif power == 1:
-            win.blit(logicup, (W / 2 - logicup.get_width() / 2, 550))
-        elif power == 2:
-            win.blit(dummyup, (W / 2 - dummyup.get_width() / 2, 550))
-        elif power == 3:
-            win.blit(baldup, (W / 2 - baldup.get_width() / 2, 550))
+        power(param)
 
 def menu():
     run = True
