@@ -32,3 +32,9 @@ fallSpeed = 0
 imunity = 0
 undead = 0
 objects = []
+
+#root = Tk()
+
+#root.geometry('425x225')
+
+#application = register(root)

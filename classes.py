@@ -10,7 +10,11 @@ import random
 
 from itertools import chain
 
+from tkinter import *
 
+from tkinter import ttk
+
+import time
 
 class player(object):
 
@@ -201,6 +205,8 @@ class button():
 
 class database(object):
 
+
+
     def __init__(self,user,password,host,db):
         self.user = user
         self.password = password
@@ -210,3 +216,82 @@ class database(object):
     def connect(self):
         return mysql.connector.connect(user=self.user, password=self.password,host=self.host,database=self.db)
 
+    def select_question(self,index):
+        return f"SELECT * FROM questions WHERE indice = {index}"
+
+class register(object):
+
+    server = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+
+    def __init__(self,root):
+
+
+
+        self.root = root
+
+        self.root.title('Cadastro')
+
+
+
+        Label(text = ' Usuário: ',font='Times 15').grid(row=1,column=1,pady=20)
+
+        self.username = Entry()
+
+        self.username.grid(row=1,column=2,columnspan=10)
+
+
+
+        Label(text = ' Senha: ',font='Times 15').grid(row=2,column=1,pady=10)
+
+        self.password = Entry(show='*')
+
+        self.password.grid(row=2,column=2,columnspan=10)
+
+        Label(text='Repetir Senha: ', font='Times 15').grid(row=3, column=1, pady=10)
+
+        self.password2 = Entry(show='*')
+
+        self.password2.grid(row=3, column=2, columnspan=10)
+
+
+
+        ttk.Button(text='CADASTRAR',command=self.login_user).grid(row=4,column=2)
+
+
+
+
+
+    def login_user(self):
+
+        cnx = self.server.connect()
+        cursor = cnx.cursor()
+
+
+        if self.username.get() == '':
+            self.message = Label(text='Usuário não pode ser vazio!', fg='Red')
+            self.message.grid(row=6, column=2)
+
+        elif self.password2.get() == self.password.get():
+            try:
+                query = f"INSERT into users values('{self.username.get()}','{self.password.get()}')"
+                cursor.execute(query)
+                cnx.commit()
+                cursor.close()
+                cnx.close()
+                self.message = Label(text='Usuário Cadastrado com Sucesso!', fg='Red')
+                self.message.grid(row=6, column=2)
+                time.sleep(1)
+                self.root.destroy()
+            except mysql.connector.Error as e:
+                if e.errno == 1062:
+                    self.message = Label(text='Usuário já cadastrado!', fg='Red')
+                    self.message.grid(row=6, column=2)
+                else:
+                    self.message = Label(text='n° de caracteres max = 16', fg='Red')
+                    self.message.grid(row=6, column=2)
+
+        else:
+
+            self.message = Label(text = 'As senhas não combinam!',fg = 'Red')
+
+            self.message.grid(row=6,column=2)

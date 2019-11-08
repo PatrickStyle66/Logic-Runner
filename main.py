@@ -105,8 +105,11 @@ def endScreen():
                     run = False
         win.blit(bg,(0,0))
         largeFont = pygame.font.SysFont('comicsans',80)
+        birdfont = pygame.font.SysFont('comicsans',35,italic=True)
         deathmsg = largeFont.render('Morreu :(',1,(255,255,255))
-        win.blit(deathmsg,(W/2 - deathmsg.get_width()/2, 100))
+        win.blit(deathmsg,(W/2 - deathmsg.get_width()/2, 100 - deathmsg.get_height()))
+        bird = birdfont.render('"Use a lógica" - Little Bird, 2019',2,(255,255,255))
+        win.blit(bird,(W/2 - bird.get_width()/2,150))
         previousScore = largeFont.render('Melhor Pontuação: ' +str(updateFile()),1,(255,255,255))
         win.blit(previousScore,(W/2 - previousScore.get_width()/2,200))
         newScore = largeFont.render('Pontuação Final: ' + str(score),1,(255,255,255))
@@ -126,7 +129,7 @@ def questionScreen():
     font = pygame.font.SysFont('comicsans',30)
     y = font.get_height()
     index = str(random.randrange(1, 11))
-    query = (f"SELECT * FROM questions WHERE indice = {index}")
+    query = server.select_question(index)
     cursor.execute(query)
     result = cursor.fetchall()
     for sentence in result:
@@ -173,7 +176,7 @@ def questionScreen():
 
 def creditScreen():
     run = True
-    back = button((0,255,0),600,25,250 ,100,'Voltar')
+    back = button((0,255,0),700,25,125 ,50,'Voltar')
     font = pygame.font.SysFont('comicsans', 30)
     prog = font.render('Programação geral:',1,(255,255,255))
     patrick = font.render('-Jonathas Patrick H. de Azevedo | jpha@ic.ufal.br',1,(255,255,255))
@@ -183,7 +186,7 @@ def creditScreen():
     copyright = font.render('©2019 Jonathas Patrick',1,(255,255,255))
     music = font.render('Música: Waterflame - Jumper',1,(255,255,255))
     while run:
-        pygame.time.delay(100)
+        pygame.time.delay(50)
         back.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
@@ -308,10 +311,37 @@ def player_choose():
         win.blit(baldutxt,(baldu.x + (baldu.width / 2 - default.get_width() / 2), baldu.y + 270 - default.get_height()))
         power(param)
 
+def acc_menu():
+    run = True
+    sign_in = button((0,255,0),350,255,250,75,'Registrar-se')
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    while run:
+        pygame.time.delay(50)
+        sign_in.draw(win,(0,0,0))
+        back.draw(win,(0,0,0))
+        pygame.display.update()
+        for event in pygame.event.get():
+            pos = pygame.mouse.get_pos()
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if sign_in.isOver(pos):
+                    root = Tk()
+                    root.geometry('425x225')
+                    application = register(root)
+                    root.mainloop()
+                if back.isOver(pos):
+                    run = False
+
+
+        win.blit(bg,(0,0))
+
 def menu():
     run = True
-    start = button((0,255,0),350,250,250,100,'Jogar')
-    credit = button((0,255,0),350,400,250,100,'Créditos')
+    start = button((0,255,0),350,225,250,75,'Jogar')
+    account = button((0,255,0),350,325,250,75,'Conta')
+    credit = button((0,255,0),350,425,250,75,'Créditos')
     font = pygame.font.Font('Minecrafter.Alt.ttf',100)
     soundfont = pygame.font.SysFont('comicsans',30)
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))
@@ -319,9 +349,10 @@ def menu():
     title = font.render('Logic Runner',1,(255,255,255))
     state = 1
     while run:
-        pygame.time.delay(100)
+        pygame.time.delay(50)
         start.draw(win,(0,0,0))
         credit.draw(win,(0,0,0))
+        account.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -335,6 +366,8 @@ def menu():
                     player_choose()
                 if credit.isOver(pos):
                     creditScreen()
+                if account.isOver(pos):
+                    acc_menu()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_m]:
             state *= -1
