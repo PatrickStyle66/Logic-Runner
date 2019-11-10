@@ -66,17 +66,37 @@ def redrawWindow():
     pygame.display.update()
 
 def updateFile():
-    f = open('scores.txt','r')
-    file = f.readlines()
-    last = int(file[0])
+    global user
+    if user == '':
+        f = open('scores.txt', 'r')
+        file = f.readlines()
+        last = int(file[0])
 
-    if last < int(score):
-        f.close()
-        file = open('scores.txt','w')
-        file.write(str(score))
-        file.close()
-        return score
-    return last
+        if last < int(score):
+            f.close()
+            file = open('scores.txt', 'w')
+            file.write(str(score))
+            file.close()
+            return score
+        return last
+    else:
+        cnx = server.connect()
+        cursor = cnx.cursor()
+        query =f"SELECT score from scores where user = '{user}'"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for num in result:
+            last = num[0]
+        if last < int(score):
+            query = f"UPDATE scores SET score = {score} where user = '{user}'"
+            cursor.execute(query)
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            return score
+        cursor.close()
+        cnx.close()
+        return  last
 
 def endScreen():
     global pause, objects,speed, score,imunity
@@ -312,13 +332,22 @@ def player_choose():
         power(param)
 
 def acc_menu():
+    global user
     run = True
-    sign_in = button((0,255,0),350,255,250,75,'Registrar-se')
+    font = pygame.font.SysFont('comicsans',50)
+    user_font = pygame.font.SysFont('comicsans',30)
+    acc = font.render('Conta',1,(255,255,255))
+    sign_in = button((0,255,0),350,155,250,75,'Registrar-se')
+    sign_up = button((0,255,0),350,255,250,75,'Login')
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    log_out = button((0,255,0),350,355,250,75,'Desconectar')
     while run:
         pygame.time.delay(50)
         sign_in.draw(win,(0,0,0))
+        sign_up.draw(win,(0,0,0))
         back.draw(win,(0,0,0))
+        if user != '':
+            log_out.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -329,15 +358,28 @@ def acc_menu():
                 if sign_in.isOver(pos):
                     root = Tk()
                     root.geometry('425x225')
-                    application = register(root)
+                    register(root)
                     root.mainloop()
+                if sign_up.isOver(pos):
+                    root = Tk()
+                    root.geometry('425x225')
+                    application = login(root)
+                    root.mainloop()
+                    user = application.get_user()
                 if back.isOver(pos):
                     run = False
-
-
+                if log_out.isOver(pos) and user != '':
+                    user = ''
+        if user == '':
+            profile = user_font.render('Não conectado',1,(255,255,255))
+        else:
+            profile = user_font.render('Conectado como: '+ user,1,(255,255,255))
         win.blit(bg,(0,0))
+        win.blit(acc,(W / 2 - acc.get_width() / 2, 50))
+        win.blit(profile,(25,550))
 
 def menu():
+    global state
     run = True
     start = button((0,255,0),350,225,250,75,'Jogar')
     account = button((0,255,0),350,325,250,75,'Conta')
@@ -347,7 +389,6 @@ def menu():
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))
     sound2 = soundfont.render('Som(M):Off',1,(255,255,255))
     title = font.render('Logic Runner',1,(255,255,255))
-    state = 1
     while run:
         pygame.time.delay(50)
         start.draw(win,(0,0,0))

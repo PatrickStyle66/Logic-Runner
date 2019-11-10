@@ -32,7 +32,8 @@ fallSpeed = 0
 imunity = 0
 undead = 0
 objects = []
-
+user = ''
+state = 1
 #root = Tk()
 
 #root.geometry('425x225')

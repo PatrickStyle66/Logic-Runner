@@ -16,6 +16,10 @@ from tkinter import ttk
 
 import time
 
+import abc
+
+from abc import ABC, abstractmethod
+
 class player(object):
 
 
@@ -125,7 +129,13 @@ class player(object):
         #pygame.draw.rect(win,(255,0,0),self.hitbox,2)
 
 
-class saw(object):
+class obstacle(ABC):
+    def collide(self,rect):
+        pass
+    def draw(self,win):
+        pass
+
+class saw(obstacle):
 
     img = [pygame.image.load(os.path.join('images','SAW0.png')),pygame.image.load(os.path.join('images','SAW1.png')),pygame.image.load(os.path.join('images','SAW2.png')),pygame.image.load(os.path.join('images','SAW3.png'))]
 
@@ -255,13 +265,13 @@ class register(object):
 
 
 
-        ttk.Button(text='CADASTRAR',command=self.login_user).grid(row=4,column=2)
+        ttk.Button(text='CADASTRAR',command=self.register_user).grid(row=4,column=2)
 
 
 
 
 
-    def login_user(self):
+    def register_user(self):
 
         cnx = self.server.connect()
         cursor = cnx.cursor()
@@ -276,10 +286,13 @@ class register(object):
                 query = f"INSERT into users values('{self.username.get()}','{self.password.get()}')"
                 cursor.execute(query)
                 cnx.commit()
-                cursor.close()
-                cnx.close()
                 self.message = Label(text='Usuário Cadastrado com Sucesso!', fg='Red')
                 self.message.grid(row=6, column=2)
+                query = f"INSERT into scores values('{self.username.get()}',0)"
+                cursor.execute(query)
+                cnx.commit()
+                cursor.close()
+                cnx.close()
                 time.sleep(1)
                 self.root.destroy()
             except mysql.connector.Error as e:
@@ -295,3 +308,63 @@ class register(object):
             self.message = Label(text = 'As senhas não combinam!',fg = 'Red')
 
             self.message.grid(row=6,column=2)
+
+class login(object):
+
+    server = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+
+    def __init__(self,root):
+
+        self.root = root
+        self.root.title('Login')
+
+        Label(text = ' Usuário: ',font='Times 15').grid(row=1,column=1,pady=20)
+        self.username = Entry()
+        self.username.grid(row=1,column=2,columnspan=10)
+
+        Label(text = ' Senha: ',font='Times 15').grid(row=2,column=1,pady=10)
+        self.password = Entry(show='*')
+        self.password.grid(row=2,column=2,columnspan=10)
+        self.user = ''
+        self.passw = ''
+        ttk.Button(text='LOGIN',command=self.login_user).grid(row=3,column=2)
+
+
+    def login_user(self):
+
+        cnx = self.server.connect()
+        cursor = cnx.cursor()
+        query = f"SELECT * from users where user = '{self.username.get()}'"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for credentials in result:
+            self.user = credentials[0]
+            self.passw = credentials[1]
+
+        if self.user == '':
+            self.message = Label(text='Usuário não cadastrado!', fg='Red')
+            self.message.grid(row=6, column=2)
+
+        elif self.username.get() == self.user and self.password.get() == self.passw:
+
+            self.root.destroy()
+
+
+
+        else:
+
+
+            self.message = Label(text = '       Senha incorreta!      ',fg = 'Red')
+            self.message.grid(row=6,column=2)
+
+
+    def get_user(self):
+        return self.user
+
+
+
+
+
+
+
+
