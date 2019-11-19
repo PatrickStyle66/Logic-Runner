@@ -346,7 +346,8 @@ class login(object):
             self.message.grid(row=6, column=2)
 
         elif self.username.get() == self.user and self.password.get() == self.passw:
-
+            cursor.close()
+            cnx.close()
             self.root.destroy()
 
 

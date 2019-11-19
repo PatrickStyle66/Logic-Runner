@@ -80,8 +80,6 @@ def updateFile():
             return score
         return last
     else:
-        cnx = server.connect()
-        cursor = cnx.cursor()
         query =f"SELECT score from scores where user = '{user}'"
         cursor.execute(query)
         result = cursor.fetchall()
@@ -91,11 +89,7 @@ def updateFile():
             query = f"UPDATE scores SET score = {score} where user = '{user}'"
             cursor.execute(query)
             cnx.commit()
-            cursor.close()
-            cnx.close()
             return score
-        cursor.close()
-        cnx.close()
         return  last
 
 def endScreen():
@@ -130,7 +124,8 @@ def endScreen():
         win.blit(deathmsg,(W/2 - deathmsg.get_width()/2, 100 - deathmsg.get_height()))
         bird = birdfont.render('"Use a lógica" - Little Bird, 2019',2,(255,255,255))
         win.blit(bird,(W/2 - bird.get_width()/2,150))
-        previousScore = largeFont.render('Melhor Pontuação: ' +str(updateFile()),1,(255,255,255))
+        usr_score = str(updateFile())
+        previousScore = largeFont.render('Melhor Pontuação: ' + usr_score,1,(255,255,255))
         win.blit(previousScore,(W/2 - previousScore.get_width()/2,200))
         newScore = largeFont.render('Pontuação Final: ' + str(score),1,(255,255,255))
         win.blit(newScore, (W / 2 - newScore.get_width() / 2, 320))
@@ -202,7 +197,8 @@ def creditScreen():
     patrick = font.render('-Jonathas Patrick H. de Azevedo | jpha@ic.ufal.br',1,(255,255,255))
     sprite = font.render('Sprites do Logic:',1,(255,255,255))
     thalyssa = font.render('-Thalyssa de Almeida Monteiro | tam@ic.ufal.br',1,(255,255,255))
-
+    ic = pygame.image.load(os.path.join('images','ic.png'))
+    ufal = pygame.image.load(os.path.join('images', 'ufal.png'))
     copyright = font.render('©2019 Jonathas Patrick',1,(255,255,255))
     music = font.render('Música: Waterflame - Jumper',1,(255,255,255))
     while run:
@@ -223,6 +219,8 @@ def creditScreen():
         win.blit(thalyssa, (0, 250))
         win.blit(sprite,(0,250 - thalyssa.get_height()))
         win.blit(copyright,(650,550))
+        win.blit(ic,(650,550 - (6 * copyright.get_height())))
+        win.blit(ufal,(775,550 - (6 * copyright.get_height())))
         win.blit(music,(50,550))
 
 
