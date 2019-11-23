@@ -144,7 +144,7 @@ def questionScreen():
     font = pygame.font.SysFont('comicsans',30)
     y = font.get_height()
     index = str(random.randrange(1, 11))
-    query = server.select_question(index)
+    query = server.select('*','questions',f'indice = {index}')
     cursor.execute(query)
     result = cursor.fetchall()
     for sentence in result:
@@ -335,17 +335,22 @@ def acc_menu():
     font = pygame.font.SysFont('comicsans',50)
     user_font = pygame.font.SysFont('comicsans',30)
     acc = font.render('Conta',1,(255,255,255))
-    sign_in = button((0,255,0),350,155,250,75,'Registrar-se')
-    sign_up = button((0,255,0),350,255,250,75,'Login')
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
     log_out = button((0,255,0),350,355,250,75,'Desconectar')
     while run:
+        sign_up = button((0,255,0),350,155,250,75,'Registrar-se')
+        sign_in = button((0,255,0),350,255,250,75,'Login')
         pygame.time.delay(50)
-        sign_in.draw(win,(0,0,0))
-        sign_up.draw(win,(0,0,0))
         back.draw(win,(0,0,0))
         if user != '':
             log_out.draw(win,(0,0,0))
+            sign_in = button((128, 128, 128), 350, 255, 250, 75, 'Login')
+            sign_up = button((128, 128, 128), 350, 155, 250, 75, 'Registrar-se')
+            sign_in.draw(win, (0, 0, 0))
+            sign_up.draw(win,(0,0,0))
+        else:
+            sign_in.draw(win,(0,0,0))
+            sign_up.draw(win, (0, 0, 0))
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -353,12 +358,12 @@ def acc_menu():
                 run = False
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if sign_in.isOver(pos):
+                if sign_up.isOver(pos) and user == '':
                     root = Tk()
                     root.geometry('425x225')
                     register(root)
                     root.mainloop()
-                if sign_up.isOver(pos):
+                if sign_in.isOver(pos) and user == '':
                     root = Tk()
                     root.geometry('425x225')
                     application = login(root)
@@ -377,7 +382,7 @@ def acc_menu():
         win.blit(profile,(25,550))
 
 def menu():
-    global state
+    global state,user
     run = True
     start = button((0,255,0),350,225,250,75,'Jogar')
     account = button((0,255,0),350,325,250,75,'Conta')
@@ -387,6 +392,7 @@ def menu():
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))
     sound2 = soundfont.render('Som(M):Off',1,(255,255,255))
     title = font.render('Logic Runner',1,(255,255,255))
+    user_font = pygame.font.SysFont('comicsans', 30)
     while run:
         pygame.time.delay(50)
         start.draw(win,(0,0,0))
@@ -415,12 +421,17 @@ def menu():
             else:
                 pygame.mixer.music.play(-1)
         if state < 0:
-            win.blit(sound2,(25,550))
+            win.blit(sound2,(775,550))
             pygame.display.update()
         else:
-            win.blit(sound1,(25,550))
+            win.blit(sound1,(775,550))
             pygame.display.update()
+        if user == '':
+            profile = user_font.render('Não conectado',1,(255,255,255))
+        else:
+            profile = user_font.render('Conectado como: '+ user,1,(255,255,255))
         win.blit(bg, (0, 0))
+        win.blit(profile, (25, 550))
         win.blit(title,(W / 2 - title.get_width() / 2, 50))
 
 

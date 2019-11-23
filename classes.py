@@ -226,8 +226,8 @@ class database(object):
     def connect(self):
         return mysql.connector.connect(user=self.user, password=self.password,host=self.host,database=self.db)
 
-    def select_question(self,index):
-        return f"SELECT * FROM questions WHERE indice = {index}"
+    def select(self,item,table,where):
+        return f"SELECT {item} FROM {table} WHERE {where}"
 
 class register(object):
 
