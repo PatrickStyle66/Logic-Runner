@@ -329,26 +329,107 @@ def player_choose():
         win.blit(baldutxt,(baldu.x + (baldu.width / 2 - default.get_width() / 2), baldu.y + 270 - default.get_height()))
         power(param)
 
+
+def request_list():
+    global user
+    run = True
+    font = pygame.font.SysFont('comicsans',30)
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    background = pygame.image.load(os.path.join('images', 'fundo.png'))
+    blits = []
+    height = []
+    y = 85
+    query = server.select('request', 'friend_request', f"user = '{user}'")
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for request in result:
+        friend = font.render(request[0], 1, (255, 255, 255))
+        blits.append(friend)
+        height.append(y)
+        y += font.get_height() + 10
+
+
+    while run:
+        pygame.time.delay(100)
+        win.blit(bg,(0,0))
+        win.blit(background,(325,75))
+        back.draw(win,(0,0,0))
+        i = 0
+        if blits == []:
+            friend = font.render('Sem solicitações', 1, (255, 255, 255))
+            win.blit(friend,(325 + (151 - friend.get_width() / 2),85))
+        else:
+            for item in blits:
+                win.blit(item, (330, height[i]))
+                i += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if back.isOver(pos):
+                    run = False
+        pygame.display.update()
+
+def friends_menu():
+    global user
+    run = True
+    font = pygame.font.Font('Minecrafter.Alt.ttf', 50)
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    add = button((0, 255, 0), 350, 155, 250, 75, 'Add Amigo')
+    request = button((0,255,0),350,255,250,75,'Solicitações')
+    title = font.render('Amigos',1,(255,255,255))
+    while run:
+        pygame.time.delay(50)
+        back.draw(win,(0,0,0))
+        add.draw(win,(0,0,0))
+        request.draw(win,(0,0,0))
+        pygame.display.update()
+        for event in pygame.event.get():
+            pos = pygame.mouse.get_pos()
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back.isOver(pos):
+                    run = False
+                if add.isOver(pos):
+                    root = Tk()
+                    root.geometry('425x125')
+                    addFriend(root,user)
+                    root.mainloop()
+                if request.isOver(pos):
+                    request_list()
+        win.blit(bg,(0,0))
+        win.blit(title, (W / 2 - title.get_width() / 2, 50))
+
 def acc_menu():
     global user
     run = True
-    font = pygame.font.SysFont('comicsans',50)
+    font = pygame.font.Font('Minecrafter.Alt.ttf',50)
     user_font = pygame.font.SysFont('comicsans',30)
-    acc = font.render('Conta',1,(255,255,255))
+    acc = font.render('ContA',1,(255,255,255))
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
-    log_out = button((0,255,0),350,355,250,75,'Desconectar')
+    sign_up = button((0, 255, 0), 0, 0, 250, 75, 'Registrar-se')
+    sign_in = button((0, 255, 0), 0, 0, 250, 75, 'Login')
+    friends = button((0, 255, 0), 0, 0, 250, 75, 'Amigos')
+    log_out = button((0, 255, 0), 0, 0, 250, 75, 'Desconectar')
+    delete = button((0, 255, 0), 0, 0, 250, 75, 'Apagar conta')
     while run:
-        sign_up = button((0,255,0),350,155,250,75,'Registrar-se')
-        sign_in = button((0,255,0),350,255,250,75,'Login')
         pygame.time.delay(50)
         back.draw(win,(0,0,0))
         if user != '':
+            friends = button((0, 255, 0), 350, 155, 250, 75, 'Amigos')
+            log_out = button((0, 255, 0), 350, 255, 250, 75, 'Desconectar')
+            delete = button((0, 255, 0), 350, 355, 250, 75, 'Apagar conta')
             log_out.draw(win,(0,0,0))
-            sign_in = button((128, 128, 128), 350, 255, 250, 75, 'Login')
-            sign_up = button((128, 128, 128), 350, 155, 250, 75, 'Registrar-se')
-            sign_in.draw(win, (0, 0, 0))
-            sign_up.draw(win,(0,0,0))
+            friends.draw(win,(0,0,0))
+            delete.draw(win,(0,0,0))
+
         else:
+            sign_up = button((0, 255, 0), 350, 155, 250, 75, 'Registrar-se')
+            sign_in = button((0, 255, 0), 350, 255, 250, 75, 'Login')
             sign_in.draw(win,(0,0,0))
             sign_up.draw(win, (0, 0, 0))
         pygame.display.update()
@@ -365,7 +446,7 @@ def acc_menu():
                     root.mainloop()
                 if sign_in.isOver(pos) and user == '':
                     root = Tk()
-                    root.geometry('425x225')
+                    root.geometry('249x183')
                     application = login(root)
                     root.mainloop()
                     user = application.get_user()
@@ -373,6 +454,9 @@ def acc_menu():
                     run = False
                 if log_out.isOver(pos) and user != '':
                     user = ''
+                    run = False
+                if friends.isOver(pos) and user != '':
+                    friends_menu()
         if user == '':
             profile = user_font.render('Não conectado',1,(255,255,255))
         else:

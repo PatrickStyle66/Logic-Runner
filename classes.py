@@ -346,11 +346,8 @@ class login(object):
             self.message.grid(row=6, column=2)
 
         elif self.username.get() == self.user and self.password.get() == self.passw:
-            cursor.close()
-            cnx.close()
+
             self.root.destroy()
-
-
 
         else:
 
@@ -362,6 +359,45 @@ class login(object):
     def get_user(self):
         return self.user
 
+class addFriend(object):
+    server = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+
+    def __init__(self, root,friend):
+
+        self.root = root
+        self.root.title('Adicionar amigo')
+
+        Label(text=' Nome de usuário: ', font='Times 15').grid(row=1, column=1, pady=20)
+        self.username = Entry()
+        self.username.grid(row=1, column=2, columnspan=10)
+        self.user = ''
+        self.friend = friend
+        ttk.Button(text='Enviar solicitação', command=self.submit).grid(row=2, column=2)
+
+    def submit(self):
+
+        cnx = self.server.connect()
+        cursor = cnx.cursor()
+        query = f"SELECT * from users where user = '{self.username.get()}'"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for credentials in result:
+            self.user = credentials[0]
+
+        if self.username.get() == self.user:
+            try:
+                query = f"INSERT into friend_request values('{self.user}','{self.friend}')"
+                cursor.execute(query)
+                cnx.commit()
+                self.message = Label(text='Solicitação enviada com Sucesso!', fg='Red')
+                self.message.grid(row=6, column=2)
+            except:
+                self.message = Label(text='Solicitação já enviada!', fg='Red')
+                self.message.grid(row=6, column=2)
+
+        else:
+            self.message = Label(text='Usuário não cadastrado!', fg='Red')
+            self.message.grid(row=6, column=2)
 
 
 
