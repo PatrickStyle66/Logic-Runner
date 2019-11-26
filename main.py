@@ -103,8 +103,7 @@ def endScreen():
     run = True
     while run:
         pygame.time.delay(100)
-        tryagain.draw(win,(0,0,0))
-        back.draw(win,(0,0,0))
+
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -118,6 +117,8 @@ def endScreen():
                     menu()
                     run = False
         win.blit(bg,(0,0))
+        tryagain.draw(win, (0, 0, 0))
+        back.draw(win, (0, 0, 0))
         largeFont = pygame.font.SysFont('comicsans',80)
         birdfont = pygame.font.SysFont('comicsans',35,italic=True)
         deathmsg = largeFont.render('Morreu :(',1,(255,255,255))
@@ -332,19 +333,32 @@ def player_choose():
 
 def request_list():
     global user
+    db = database('Patrick','','35.198.62.112 ','LogicRunner')
+    cnx = server.connect()
+    cursor = cnx.cursor()
     run = True
     font = pygame.font.SysFont('comicsans',30)
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
     background = pygame.image.load(os.path.join('images', 'fundo.png'))
+    user_font = pygame.font.SysFont('comicsans', 30)
     blits = []
     height = []
+    users = []
+    accept = []
+    decline = []
+    notblit = []
     y = 85
-    query = server.select('request', 'friend_request', f"user = '{user}'")
+    query = db.select('request', 'friend_request', f"user = '{user}'")
     cursor.execute(query)
     result = cursor.fetchall()
     for request in result:
         friend = font.render(request[0], 1, (255, 255, 255))
         blits.append(friend)
+        users.append(request[0])
+        accbutton = button((0,255,0),570,y,20,20,'√',0,30,(255,255,255))
+        decbutton = button((255,0,0),600,y,20,20,'X',0,30,(255,255,255))
+        accept.append(accbutton)
+        decline.append(decbutton)
         height.append(y)
         y += font.get_height() + 10
 
@@ -356,13 +370,18 @@ def request_list():
         back.draw(win,(0,0,0))
         i = 0
         if blits == []:
-            friend = font.render('Sem solicitações', 1, (255, 255, 255))
+            friend = font.render('Sem solicitações ;-;', 1, (255, 255, 255))
             win.blit(friend,(325 + (151 - friend.get_width() / 2),85))
         else:
             for item in blits:
                 win.blit(item, (330, height[i]))
+                if i not in notblit:
+                    accept[i].draw(win, (0, 0, 0))
+                    decline[i].draw(win, (0, 0, 0))
                 i += 1
+
         for event in pygame.event.get():
+            i = 0
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
@@ -370,7 +389,33 @@ def request_list():
                 pos = pygame.mouse.get_pos()
                 if back.isOver(pos):
                     run = False
+                for click in accept:
+                    if click.isOver(pos):
+                        query =f"insert into friends values('{user}','{users[accept.index(click)]}')"
+                        cursor.execute(query)
+                        query =f"insert into friends values('{users[accept.index(click)]}','{user}')"
+                        cursor.execute(query)
+                        query = f"delete from friend_request where user = '{user}' and request = '{users[accept.index(click)]}'"
+                        cursor.execute(query)
+                        cnx.commit()
+                        blits[accept.index(click)] = font.render('Aceito!',1,(0,255,0))
+                        users.pop(accept.index(click))
+                        notblit.append(accept.index(click))
+
+                for click in decline:
+                    if click.isOver(pos):
+                        query = f"delete from friend_request where user = '{user}'and request = '{users[decline.index(click)]}'"
+                        cursor.execute(query)
+                        cnx.commit()
+                        blits[decline.index(click)] = font.render('Rejeitado!',1,(255,0,0))
+                        users.pop(decline.index(click))
+                        notblit.append(decline.index(click))
+
+        profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
+        win.blit(profile, (25, 550))
         pygame.display.update()
+    cnx.close()
+    cursor.close()
 
 def friends_menu():
     global user
@@ -380,6 +425,7 @@ def friends_menu():
     add = button((0, 255, 0), 350, 155, 250, 75, 'Add Amigo')
     request = button((0,255,0),350,255,250,75,'Solicitações')
     title = font.render('Amigos',1,(255,255,255))
+    user_font = pygame.font.SysFont('comicsans', 30)
     while run:
         pygame.time.delay(50)
         back.draw(win,(0,0,0))
@@ -401,8 +447,12 @@ def friends_menu():
                     root.mainloop()
                 if request.isOver(pos):
                     request_list()
+
+        profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
         win.blit(bg,(0,0))
         win.blit(title, (W / 2 - title.get_width() / 2, 50))
+        win.blit(profile, (25, 550))
+
 
 def acc_menu():
     global user
@@ -416,6 +466,7 @@ def acc_menu():
     friends = button((0, 255, 0), 0, 0, 250, 75, 'Amigos')
     log_out = button((0, 255, 0), 0, 0, 250, 75, 'Desconectar')
     delete = button((0, 255, 0), 0, 0, 250, 75, 'Apagar conta')
+
     while run:
         pygame.time.delay(50)
         back.draw(win,(0,0,0))

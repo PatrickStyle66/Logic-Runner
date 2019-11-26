@@ -391,6 +391,8 @@ class addFriend(object):
                 cnx.commit()
                 self.message = Label(text='Solicitação enviada com Sucesso!', fg='Red')
                 self.message.grid(row=6, column=2)
+                cursor.close()
+                cnx.close()
             except:
                 self.message = Label(text='Solicitação já enviada!', fg='Red')
                 self.message.grid(row=6, column=2)
