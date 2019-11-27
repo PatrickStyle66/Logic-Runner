@@ -19,11 +19,15 @@ O jogador terá a opção de selecionar um personagem com o qual deseja jogar, c
 Cadastra um jogador garantindo ao mesmo a possibilidade de registrar pontuações e adicionar amigos.
 #### Fazer login
 Após cadastrado o jogador poderá acessar sua conta através do login.
+#### Apagar conta
+Remove a conta de um jogador do banco de dados.
 #### Registrar Pontuação
 O jogador poderá registrar sua pontuação máxima no banco de dados do jogo, podendo ser exibida nos *Leaderboards*(Tabela onde são Divulgados nome e pontuação de jogadores de acordo com seu desempenho.)
 #### Adicionar amigo
 O jogador poderá adicionar outros jogadores ao seu ciclo de amizades o permitindo enviar *Power-up's* e criar questões customizadas.
+#### Remover amigo
+Remove um usuário da lista de amigos.
 #### Enviar *Power-up's*
 O jogador poderá enviar *Power-up's* a outros jogadores que estiverem em seu ciclo de amizades para ajudá-los, os *Power-up's* só podem ser enviados num período de 3 horas.
 #### Criar questões customizadas
-O jogador poderá criar um banco de questões customizado para outros jogadores que estiverem em seu ciclo de amizades, o jogador terá a opção de jogar com as questões fornecidas pelo jogo ou jogar com as questões fornecidas pelos amigos.
+O jogador poderá criar um banco de questões customizado para outros jogadores que estiverem em seu círculo de amizades, o jogador terá a opção de jogar com as questões fornecidas pelo jogo ou jogar com as questões fornecidas pelos amigos.
