@@ -293,8 +293,7 @@ class register(object):
                 cnx.commit()
                 cursor.close()
                 cnx.close()
-                time.sleep(1)
-                self.root.destroy()
+
             except mysql.connector.Error as e:
                 if e.errno == 1062:
                     self.message = Label(text='Usuário já cadastrado!', fg='Red')
@@ -545,7 +544,7 @@ class submit_question(object):
                 self.message = Label(text='Vocês não são amigos!', fg='Red')
                 self.message.grid(row=12, column=2)
             else:
-                query = self.server.select('count(indice)','custom_questions',f"user = '{self.user}'")
+                query = self.server.select('count(indice)','custom_questions',f"user = '{self.friend.get()}'")
                 cursor.execute(query)
                 result = cursor.fetchall()
                 for number in result:

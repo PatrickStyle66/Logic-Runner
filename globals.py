@@ -32,3 +32,4 @@ undead = 0
 objects = []
 user = ''
 state = 1
+custom_quest = False

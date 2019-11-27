@@ -134,7 +134,8 @@ def endScreen():
     runner.falling = False
 
 def questionScreen():
-    global score, pause, imunity
+    global score, pause, imunity,user,custom_quest
+    cnx.commit()
     imunity  = 500
     pause = 0
     run = True
@@ -144,17 +145,35 @@ def questionScreen():
     ButtonD = button((0, 255, 0), 520, 470, 250, 100, 'Alternativa D')
     font = pygame.font.SysFont('comicsans',30)
     y = font.get_height()
-    index = str(random.randrange(1, 11))
-    query = server.select('*','questions',f'indice = {index}')
-    cursor.execute(query)
-    result = cursor.fetchall()
-    for sentence in result:
-        text = wrapline(sentence[1],font,928)
-        questA = font.render('a)' + sentence[2], 1, (255, 255, 255))
-        questB = font.render('b)' + sentence[3], 1, (255, 255, 255))
-        questC = font.render('c)' + sentence[4], 1, (255, 255, 255))
-        questD = font.render('d)' + sentence[5], 1, (255, 255, 255))
-        right = sentence[6]
+    if not custom_quest:
+        index = str(random.randrange(1, 11))
+        query = server.select('*', 'questions', f'indice = {index}')
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for sentence in result:
+            text = wrapline(sentence[1], font, 928)
+            questA = font.render('a)' + sentence[2], 1, (255, 255, 255))
+            questB = font.render('b)' + sentence[3], 1, (255, 255, 255))
+            questC = font.render('c)' + sentence[4], 1, (255, 255, 255))
+            questD = font.render('d)' + sentence[5], 1, (255, 255, 255))
+            right = sentence[6]
+    else:
+        query = server.select('count(indice)', 'custom_questions', f"user = '{user}'")
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for num in result:
+            index = str(random.randrange(1,int(num[0]) + 1))
+            query = server.select('*', 'custom_questions', f"indice = {index} and user ='{user}'")
+            cursor.execute(query)
+            result = cursor.fetchall()
+            for sentence in result:
+                text = wrapline(sentence[2], font, 928)
+                questA = font.render('a)' + sentence[3], 1, (255, 255, 255))
+                questB = font.render('b)' + sentence[4], 1, (255, 255, 255))
+                questC = font.render('c)' + sentence[5], 1, (255, 255, 255))
+                questD = font.render('d)' + sentence[6], 1, (255, 255, 255))
+                right = sentence[7]
+
     blits = []
     buttons = [ButtonA,ButtonB,ButtonC,ButtonD]
     correct = buttons.pop(int(right))
@@ -200,6 +219,8 @@ def creditScreen():
     thalyssa = font.render('-Thalyssa de Almeida Monteiro | tam@ic.ufal.br',1,(255,255,255))
     ic = pygame.image.load(os.path.join('images','ic.png'))
     ufal = pygame.image.load(os.path.join('images', 'ufal.png'))
+    data = font.render('Banco de Dados:',1,(255,255,255))
+    google = pygame.image.load(os.path.join('images','google_cloud.png'))
     copyright = font.render('©2019 Jonathas Patrick',1,(255,255,255))
     music = font.render('Música: Waterflame - Jumper',1,(255,255,255))
     while run:
@@ -222,6 +243,8 @@ def creditScreen():
         win.blit(copyright,(650,550))
         win.blit(ic,(650,550 - (6 * copyright.get_height())))
         win.blit(ufal,(775,550 - (6 * copyright.get_height())))
+        win.blit(data,(0,300))
+        win.blit(google,(50,350))
         win.blit(music,(50,550))
 
 
@@ -240,7 +263,7 @@ def player_choose():
     run = True
     logic = button((255,255,255),200,150,150,300,'',5)
     dummy = button((255,255,255),400,150,150,300,'',5)
-    baldu = button((255,255,255),600,150,150,300,'placeholder',5,30)
+    baldu = button((255,255,255),600,150,150,300,'Em Breve',5,30)
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
     font = pygame.font.SysFont('comicsans',50)
     runfont = pygame.font.SysFont('comicsans',30)
@@ -297,13 +320,13 @@ def player_choose():
                 pygame.display.update()
 
             if baldu.isOver(pos):
-                baldu = button((0, 255, 0), 600, 150, 150, 300, 'placeholder', 5,30,(255,255,255))
+                baldu = button((0, 255, 0), 600, 150, 150, 300, 'Em breve', 5,30,(255,255,255))
                 baldu.draw(win, (0, 0, 0))
                 power = baldufun
                 param = baldup
                 pygame.display.update()
             else:
-                baldu = button((255, 255, 255), 600, 150, 150, 300, 'placeholder', 5,30,(255,255,255))
+                baldu = button((255, 255, 255), 600, 150, 150, 300, 'Em breve', 5,30,(255,255,255))
                 baldu.draw(win, (0, 0, 0))
 
                 win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
@@ -334,6 +357,61 @@ def player_choose():
         win.blit(dummytxt,(dummy.x + (dummy.width / 2 - default.get_width() / 2), dummy.y + 270 - default.get_height()))
         win.blit(baldutxt,(baldu.x + (baldu.width / 2 - default.get_width() / 2), baldu.y + 270 - default.get_height()))
         power(param)
+
+def rank_menu():
+    db = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+    cnx = server.connect()
+    cursor = cnx.cursor()
+    run = True
+    font = pygame.font.SysFont('comicsans', 30)
+    titlefont = pygame.font.Font('Minecrafter.Alt.ttf', 50)
+    title = titlefont.render('RAnking', 1, (255, 255, 255))
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    background = pygame.image.load(os.path.join('images', 'fundo.png'))
+    user_font = pygame.font.SysFont('comicsans', 30)
+    blits = []
+    height = []
+    scores = []
+    y = 85
+    query = "SELECT * from scores order by score desc"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for request in result:
+        friend = font.render(request[0], 1, (255, 255, 255))
+        blits.append(friend)
+        score = font.render(str(request[1]),1,(255,255,255))
+        scores.append(score)
+        height.append(y)
+        y += font.get_height() + 10
+
+    while run:
+        pygame.time.delay(100)
+        win.blit(bg, (0, 0))
+        win.blit(background, (325, 75))
+        back.draw(win, (0, 0, 0))
+        i = 0
+        if blits == []:
+            friend = font.render('Ninguém jogou ;-;', 1, (255, 255, 255))
+            win.blit(friend, (325 + (151 - friend.get_width() / 2), 85))
+        else:
+            for item in blits:
+                win.blit(item, (330, height[i]))
+                win.blit(scores[i],(600,height[i]))
+                i += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if back.isOver(pos):
+                    run = False
+
+        win.blit(title, (W / 2 - title.get_width() / 2, 30))
+        pygame.display.update()
+    cnx.close()
+    cursor.close()
 
 def friends_list():
     global user
@@ -497,7 +575,7 @@ def request_list():
     cursor.close()
 
 def friends_menu():
-    global user
+    global user,custom_quest
     run = True
     font = pygame.font.Font('Minecrafter.Alt.ttf', 50)
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
@@ -507,6 +585,17 @@ def friends_menu():
     custom = button((0,255,0),350,455,250,75,'Enviar Questões',0,40)
     title = font.render('Amigos',1,(255,255,255))
     user_font = pygame.font.SysFont('comicsans', 30)
+    cust_font = user_font.render('Quest. customizadas:',1,(255,255,255))
+    query = server.select('indice','custom_questions',f"user = '{user}'")
+    cursor.execute(query)
+    result = cursor.fetchall()
+    blit = False
+    if result != []:
+        blit = True
+    if custom_quest:
+        set = 1
+    else:
+        set = -1
     while run:
         pygame.time.delay(50)
         back.draw(win,(0,0,0))
@@ -514,6 +603,14 @@ def friends_menu():
         request.draw(win,(0,0,0))
         friendlist.draw(win,(0,0,0))
         custom.draw(win,(0,0,0))
+        if custom_quest and blit:
+            cust_button = button((0,255,0),830,550,75,30,'Sim',0,30,(255,255,255))
+            cust_button.draw(win,(0,0,0))
+
+        elif blit:
+            cust_button = button((255, 0, 0), 830, 550, 75, 30, 'Não', 0, 30, (255, 255, 255))
+            cust_button.draw(win, (0, 0, 0))
+
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -537,11 +634,21 @@ def friends_menu():
                     root.geometry('457x540')
                     submit_question(root, user)
                     root.mainloop()
+                if blit:
+                    if cust_button.isOver(pos):
+                        if set == 1:
+                            custom_quest = False
+                            set = set * -1
+                        else:
+                            custom_quest = True
+                            set = set * - 1
+
         profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
         win.blit(bg,(0,0))
         win.blit(title, (W / 2 - title.get_width() / 2, 50))
         win.blit(profile, (25, 550))
-
+        if blit:
+            win.blit(cust_font, (600, 550))
 
 def acc_menu():
     global user
@@ -616,9 +723,10 @@ def acc_menu():
 def menu():
     global state,user
     run = True
-    start = button((0,255,0),350,225,250,75,'Jogar')
-    account = button((0,255,0),350,325,250,75,'Conta')
-    credit = button((0,255,0),350,425,250,75,'Créditos')
+    start = button((0,255,0),350,175,250,75,'Jogar')
+    account = button((0,255,0),350,275,250,75,'Conta')
+    ranking = button((0,255,0),350,375,250,75,'Ranking')
+    credit = button((0,255,0),350,475,250,75,'Créditos')
     font = pygame.font.Font('Minecrafter.Alt.ttf',100)
     soundfont = pygame.font.SysFont('comicsans',30)
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))
@@ -630,6 +738,7 @@ def menu():
         start.draw(win,(0,0,0))
         credit.draw(win,(0,0,0))
         account.draw(win,(0,0,0))
+        ranking.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -644,6 +753,8 @@ def menu():
                     creditScreen()
                 if account.isOver(pos):
                     acc_menu()
+                if ranking.isOver(pos):
+                    rank_menu()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_m]:
             state *= -1
