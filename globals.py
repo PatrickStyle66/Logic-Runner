@@ -13,8 +13,6 @@ bgX2 = bg.get_width()
 
 clock = pygame.time.Clock()
 
-chayenne = pygame.image.load(os.path.join('images','chayenne.jpg'))
-
 
 server = database('Patrick','','35.198.62.112 ','LogicRunner')
 
@@ -34,8 +32,3 @@ undead = 0
 objects = []
 user = ''
 state = 1
-#root = Tk()
-
-#root.geometry('425x225')
-
-#application = register(root)

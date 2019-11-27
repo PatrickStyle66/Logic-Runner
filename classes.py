@@ -384,7 +384,15 @@ class addFriend(object):
         for credentials in result:
             self.user = credentials[0]
 
-        if self.username.get() == self.user:
+        query = f"SELECT * from friends where user = '{self.user}' and friend = '{self.friend}'"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        if result != []:
+            self.message = Label(text='Vocês já são amigos!', fg='Red')
+            self.message.grid(row=6, column=2)
+
+
+        elif self.username.get() == self.user:
             try:
                 query = f"INSERT into friend_request values('{self.user}','{self.friend}')"
                 cursor.execute(query)
@@ -400,6 +408,159 @@ class addFriend(object):
         else:
             self.message = Label(text='Usuário não cadastrado!', fg='Red')
             self.message.grid(row=6, column=2)
+
+class delete_acc(object):
+    server = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+
+    def __init__(self, root,user):
+
+        self.root = root
+
+        self.root.title('Apagar conta')
+
+        self.user = user
+
+
+        Label(text=' Senha: ', font='Times 15').grid(row=1, column=1, pady=10)
+
+        self.password = Entry(show='*')
+
+        self.password.grid(row=1, column=2, columnspan=10)
+
+        Label(text='Repetir Senha: ', font='Times 15').grid(row=2, column=1, pady=10)
+
+        self.password2 = Entry(show='*')
+
+        self.password2.grid(row=2, column=2, columnspan=10)
+
+        ttk.Button(text='APAGAR', command=self.submit).grid(row=4, column=2)
+
+    def get_user(self):
+        return self.user
+
+    def submit(self):
+
+        cnx = self.server.connect()
+        cursor = cnx.cursor()
+        query = f"DELETE from users where user = '{self.user}'"
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        self.user = ''
+        time.sleep(1)
+        self.root.destroy()
+
+class submit_question(object):
+    server = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+
+    def radioEvent(self):
+        radSelected = self.radValues.get()
+
+        if radSelected == 1:
+            self.answer = 0
+        elif radSelected == 2:
+            self.answer = 1
+        elif radSelected == 3:
+            self.answer = 2
+        elif radSelected == 4:
+            self.answer = 3
+
+    def __init__(self, root,user):
+
+        self.root = root
+
+        self.root.title('Criar Questões')
+
+        self.user = user
+
+        self.answer = 0
+
+        Label(text=' Amigo: ', font='Times 15').grid(row=1, column=1, pady=10)
+
+        self.friend = Entry()
+
+        self.friend.grid(row=1, column=2, columnspan=10,sticky = W)
+
+        Label(text='Pergunta: ', font='Times 15').grid(row=2, column=1,pady=10)
+
+        self.question = Text(self.root, height=8, width=35)
+        self.question.grid(row=2, column=2, columnspan=10,pady=10)
+
+        Label(text='Letra A: ',font ='Times 15').grid(row = 3,column = 1,pady=10)
+
+        self.a = Entry()
+        self.a.grid(row = 3,column = 2,columnspan =10,sticky=W)
+
+        Label(text='Letra B: ', font='Times 15').grid(row=4, column=1, pady=10)
+
+        self.b = Entry()
+        self.b.grid(row=4, column=2, columnspan=10,sticky = W)
+
+        Label(text='Letra C: ', font='Times 15').grid(row=5, column=1, pady=10)
+
+        self.c = Entry()
+        self.c.grid(row=5, column=2, columnspan=10,sticky = W)
+
+        Label(text='Letra D: ', font='Times 15').grid(row=6, column=1, pady=10)
+
+        self.d = Entry()
+        self.d.grid(row=6, column=2, columnspan=10,sticky = W)
+
+        Label(text='Resposta:', font='Times 15').grid(row=7, column=1, pady=3)
+
+        self.radValues = IntVar()
+
+        rad1 = ttk.Radiobutton(text ='a',value = 1,variable = self.radValues,command = self.radioEvent)
+        rad1.grid(row = 7,column = 2, columnspan = 3,sticky = W)
+
+        rad2 = ttk.Radiobutton(text='b', value=2,variable = self.radValues,command = self.radioEvent)
+        rad2.grid(row=8, column=2, columnspan=3,sticky = W)
+
+        rad3 = ttk.Radiobutton(text='c', value=3,variable = self.radValues,command = self.radioEvent)
+        rad3.grid(row=9, column=2, columnspan=3,sticky = W)
+
+        rad4 = ttk.Radiobutton(text='d', value=4,variable = self.radValues,command = self.radioEvent)
+        rad4.grid(row=10, column=2, columnspan=3,sticky = W)
+
+        ttk.Button(text='Enviar', command=self.submit).grid(row=11, column=2)
+
+
+
+    def submit(self):
+        amount = 0
+        cnx = self.server.connect()
+        cursor = cnx.cursor()
+        query = self.server.select('user','users',f"user ='{self.friend.get()}'")
+        cursor.execute(query)
+        result = cursor.fetchall()
+        if result == []:
+            self.message = Label(text='Usuário não existe!', fg='Red')
+            self.message.grid(row=12, column=2)
+        else:
+            query = self.server.select('friend','friends',f"user ='{self.user}' and friend = '{self.friend.get()}'")
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if result == []:
+                self.message = Label(text='Vocês não são amigos!', fg='Red')
+                self.message.grid(row=12, column=2)
+            else:
+                query = self.server.select('count(indice)','custom_questions',f"user = '{self.user}'")
+                cursor.execute(query)
+                result = cursor.fetchall()
+                for number in result:
+                    amount = int(number[0]) + 1
+                try:
+                    query =f"INSERT into custom_questions values('{self.friend.get()}',{amount},'{'(' + self.user + ')' + self.question.get('1.0',END)}','{self.a.get()}','{self.b.get()}','{self.c.get()}','{self.d.get()}','{str(self.answer)}')"
+                    cursor.execute(query)
+                    cnx.commit()
+                    self.message = Label(text='Questão Enviada!', fg='Red')
+                    self.message.grid(row=12, column=2)
+                except:
+                    self.message = Label(text='nº max de caracteres excedido!', fg='Red')
+                    self.message.grid(row=12, column=2)
+
+
 
 
 

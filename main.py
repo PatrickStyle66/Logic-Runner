@@ -241,6 +241,7 @@ def player_choose():
     logic = button((255,255,255),200,150,150,300,'',5)
     dummy = button((255,255,255),400,150,150,300,'',5)
     baldu = button((255,255,255),600,150,150,300,'placeholder',5,30)
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
     font = pygame.font.SysFont('comicsans',50)
     runfont = pygame.font.SysFont('comicsans',30)
     choose = font.render('Escolha o personagem',1,(255,255,255))
@@ -260,6 +261,7 @@ def player_choose():
         logic.draw(win,(0,0,0))
         dummy.draw(win,(0,0,0))
         baldu.draw(win,(0,0,0))
+        back.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
 
@@ -314,10 +316,13 @@ def player_choose():
                 if logic.isOver(pos):
                     run = False
                     runner = player(200, 468, 64, 64, '')
+                    return False
                 if dummy.isOver(pos):
                     run = False
                     runner = player(200, 468, 64, 64, 'dummy')
-
+                    return False
+                if back.isOver(pos):
+                    return True
         win.blit(bg,(0,0))
         win.blit(choose,(W / 2 - choose.get_width() / 2, 50))
         win.blit(logic_im,(logic.x + (logic.width / 2 - 55 / 2), logic.y + (logic.height / 2 - 64 / 2)))
@@ -330,6 +335,78 @@ def player_choose():
         win.blit(baldutxt,(baldu.x + (baldu.width / 2 - default.get_width() / 2), baldu.y + 270 - default.get_height()))
         power(param)
 
+def friends_list():
+    global user
+    db = database('Patrick', '', '35.198.62.112 ', 'LogicRunner')
+    cnx = server.connect()
+    cursor = cnx.cursor()
+    run = True
+    font = pygame.font.SysFont('comicsans', 30)
+    titlefont = pygame.font.Font('Minecrafter.Alt.ttf',50)
+    title = titlefont.render('Amigos',1,(255,255,255))
+    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    background = pygame.image.load(os.path.join('images', 'fundo.png'))
+    user_font = pygame.font.SysFont('comicsans', 30)
+    blits = []
+    height = []
+    users = []
+    decline = []
+    notblit = []
+    y = 85
+    query = db.select('friend', 'friends', f"user = '{user}'")
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for request in result:
+        friend = font.render(request[0], 1, (255, 255, 255))
+        blits.append(friend)
+        users.append(request[0])
+        decbutton = button((255, 0, 0), 600, y, 20, 20, 'X', 0, 30, (255, 255, 255))
+        decline.append(decbutton)
+        height.append(y)
+        y += font.get_height() + 10
+
+    while run:
+        pygame.time.delay(100)
+        win.blit(bg, (0, 0))
+        win.blit(background, (325, 75))
+        back.draw(win, (0, 0, 0))
+        i = 0
+        if blits == []:
+            friend = font.render('Sem Amigos ;-;', 1, (255, 255, 255))
+            win.blit(friend, (325 + (151 - friend.get_width() / 2), 85))
+        else:
+            for item in blits:
+                win.blit(item, (330, height[i]))
+                if i not in notblit:
+                    decline[i].draw(win, (0, 0, 0))
+                i += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if back.isOver(pos):
+                    run = False
+                for click in decline:
+                    if click.isOver(pos):
+                        query = f"delete from friends where user = '{user}'and friend = '{users[decline.index(click)]}'"
+                        cursor.execute(query)
+                        query = f"delete from friends where user = '{users[decline.index(click)]}'and friend = '{user}'"
+                        cursor.execute(query)
+                        cnx.commit()
+                        blits[decline.index(click)] = font.render('Amigo Removido!', 1, (255, 0, 0))
+                        users.pop(decline.index(click))
+                        notblit.append(decline.index(click))
+
+        profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
+        win.blit(profile, (25, 550))
+        win.blit(title,(W / 2 - title.get_width() / 2, 30))
+        pygame.display.update()
+    cnx.close()
+    cursor.close()
+
 
 def request_list():
     global user
@@ -341,6 +418,8 @@ def request_list():
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
     background = pygame.image.load(os.path.join('images', 'fundo.png'))
     user_font = pygame.font.SysFont('comicsans', 30)
+    titlefont = pygame.font.SysFont('comicsans',50)
+    title = titlefont.render('Solicitações',1,(255,255,255))
     blits = []
     height = []
     users = []
@@ -381,7 +460,6 @@ def request_list():
                 i += 1
 
         for event in pygame.event.get():
-            i = 0
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
@@ -413,6 +491,7 @@ def request_list():
 
         profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
         win.blit(profile, (25, 550))
+        win.blit(title,(W / 2 - title.get_width() / 2, 30))
         pygame.display.update()
     cnx.close()
     cursor.close()
@@ -422,8 +501,10 @@ def friends_menu():
     run = True
     font = pygame.font.Font('Minecrafter.Alt.ttf', 50)
     back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
-    add = button((0, 255, 0), 350, 155, 250, 75, 'Add Amigo')
+    friendlist = button((0,255,0),350,155,250,75,'Lista de Amigos',0,40)
     request = button((0,255,0),350,255,250,75,'Solicitações')
+    add = button((0, 255, 0), 350, 355, 250, 75, 'Adicionar Amigo',0,40)
+    custom = button((0,255,0),350,455,250,75,'Enviar Questões',0,40)
     title = font.render('Amigos',1,(255,255,255))
     user_font = pygame.font.SysFont('comicsans', 30)
     while run:
@@ -431,6 +512,8 @@ def friends_menu():
         back.draw(win,(0,0,0))
         add.draw(win,(0,0,0))
         request.draw(win,(0,0,0))
+        friendlist.draw(win,(0,0,0))
+        custom.draw(win,(0,0,0))
         pygame.display.update()
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -447,7 +530,13 @@ def friends_menu():
                     root.mainloop()
                 if request.isOver(pos):
                     request_list()
-
+                if friendlist.isOver(pos):
+                    friends_list()
+                if custom.isOver(pos):
+                    root = Tk()
+                    root.geometry('457x540')
+                    submit_question(root, user)
+                    root.mainloop()
         profile = user_font.render('Conectado como: ' + user, 1, (255, 255, 255))
         win.blit(bg,(0,0))
         win.blit(title, (W / 2 - title.get_width() / 2, 50))
@@ -497,7 +586,7 @@ def acc_menu():
                     root.mainloop()
                 if sign_in.isOver(pos) and user == '':
                     root = Tk()
-                    root.geometry('249x183')
+                    root.geometry('318x183')
                     application = login(root)
                     root.mainloop()
                     user = application.get_user()
@@ -508,6 +597,14 @@ def acc_menu():
                     run = False
                 if friends.isOver(pos) and user != '':
                     friends_menu()
+                if delete.isOver(pos) and user != '':
+                    root = Tk()
+                    root.geometry('318x183')
+                    application = delete_acc(root,user)
+                    root.mainloop()
+                    user = application.get_user()
+                    if user == '':
+                        run = False
         if user == '':
             profile = user_font.render('Não conectado',1,(255,255,255))
         else:
@@ -541,9 +638,8 @@ def menu():
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start.isOver(pos):
-                    run = False
-                    pygame.display.update()
-                    player_choose()
+                   pygame.display.update()
+                   run = player_choose()
                 if credit.isOver(pos):
                     creditScreen()
                 if account.isOver(pos):
@@ -622,10 +718,10 @@ while run:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_UP] or keys[pygame.K_w]:
         if not (runner.jumping):
             runner.jumping = True
-    if keys[pygame.K_DOWN]:
+    if keys[pygame.K_DOWN] or keys[pygame.K_s]:
         if not(runner.sliding):
             runner.sliding = True
     clock.tick(speed)
