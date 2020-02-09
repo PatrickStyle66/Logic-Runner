@@ -205,12 +205,6 @@ class button():
 
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), self.std.filled)
 
-        if self.std.text != '':
-            font = pygame.font.SysFont('comicsans', self.std.fontScale)
-            text = font.render(self.std.text, 1, self.std.colorFont)
-            win.blit(text, (
-            self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
-
     def isOver(self, pos):
 
         if pos[0] > self.x and pos[0] < self.x + self.width:
@@ -219,6 +213,15 @@ class button():
 
         return False
 
+#A classe implementa o Padrão Extract class
+class text_button(button):
+    def draw(self, win, outline=None):
+        if outline:
+            pygame.draw.rect(win, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), self.std.filled)
+            font = pygame.font.SysFont('comicsans', self.std.fontScale)
+            text = font.render(self.std.text, 1, self.std.colorFont)
+            win.blit(text, (
+                self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
 
 class database(object):
 
@@ -275,7 +278,17 @@ class register(object):
         ttk.Button(text='CADASTRAR',command=self.register_user).grid(row=4,column=2)
 
 
-
+    def insert(self,cnx,cursor):
+        query = f"INSERT into users values('{self.username.get()}','{self.password.get()}')"
+        cursor.execute(query)
+        cnx.commit()
+        self.message = Label(text='Usuário Cadastrado com Sucesso!', fg='Red')
+        self.message.grid(row=6, column=2)
+        query = f"INSERT into scores values('{self.username.get()}',0)"
+        cursor.execute(query)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
 
 
     def register_user(self):
@@ -290,16 +303,7 @@ class register(object):
 
         elif self.password2.get() == self.password.get():
             try:
-                query = f"INSERT into users values('{self.username.get()}','{self.password.get()}')"
-                cursor.execute(query)
-                cnx.commit()
-                self.message = Label(text='Usuário Cadastrado com Sucesso!', fg='Red')
-                self.message.grid(row=6, column=2)
-                query = f"INSERT into scores values('{self.username.get()}',0)"
-                cursor.execute(query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
+                self.insert(cnx,cursor)
 
             except mysql.connector.Error as e:
                 if e.errno == 1062:
@@ -380,6 +384,15 @@ class addFriend(object):
         self.friend = friend
         ttk.Button(text='Enviar solicitação', command=self.submit).grid(row=2, column=2)
 
+    def insert(self,cnx,cursor):
+        query = f"INSERT into friend_request values('{self.user}','{self.friend}')"
+        cursor.execute(query)
+        cnx.commit()
+        self.message = Label(text='Solicitação enviada com Sucesso!', fg='Red')
+        self.message.grid(row=6, column=2)
+        cursor.close()
+        cnx.close()
+
     def submit(self):
 
         cnx = self.server.connect()
@@ -400,13 +413,7 @@ class addFriend(object):
 
         elif self.username.get() == self.user:
             try:
-                query = f"INSERT into friend_request values('{self.user}','{self.friend}')"
-                cursor.execute(query)
-                cnx.commit()
-                self.message = Label(text='Solicitação enviada com Sucesso!', fg='Red')
-                self.message.grid(row=6, column=2)
-                cursor.close()
-                cnx.close()
+                self.insert(cnx,cursor)
             except:
                 self.message = Label(text='Solicitação já enviada!', fg='Red')
                 self.message.grid(row=6, column=2)
@@ -531,7 +538,12 @@ class submit_question(object):
 
         ttk.Button(text='Enviar', command=self.submit).grid(row=11, column=2)
 
-
+    def insert(self,cnx,cursor):
+        query = f"INSERT into custom_questions values('{self.friend.get()}',{amount},'{'(' + self.user + ')' + self.question.get('1.0', END)}','{self.a.get()}','{self.b.get()}','{self.c.get()}','{self.d.get()}','{str(self.answer)}')"
+        cursor.execute(query)
+        cnx.commit()
+        self.message = Label(text='Questão Enviada!', fg='Red')
+        self.message.grid(row=12, column=2)
 
     def submit(self):
         amount = 0
@@ -557,11 +569,7 @@ class submit_question(object):
                 for number in result:
                     amount = int(number[0]) + 1
                 try:
-                    query =f"INSERT into custom_questions values('{self.friend.get()}',{amount},'{'(' + self.user + ')' + self.question.get('1.0',END)}','{self.a.get()}','{self.b.get()}','{self.c.get()}','{self.d.get()}','{str(self.answer)}')"
-                    cursor.execute(query)
-                    cnx.commit()
-                    self.message = Label(text='Questão Enviada!', fg='Red')
-                    self.message.grid(row=12, column=2)
+                    self.insert(cnx,cursor)
                 except:
                     self.message = Label(text='nº max de caracteres excedido!', fg='Red')
                     self.message.grid(row=12, column=2)

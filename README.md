@@ -7,6 +7,11 @@ A proposta do jogo, além de divertir, é estimular o raciocínio lógico.
 
 ## Refatoramento
 -Implementação do padrão *Introduce Parameter Object* na classe "button"
+
+-implementação do padrão *Extract Class* na classe "text_button" extraída da classe "button"
+
+-implementação do padrão *Extract Method* nas classes "register","add_friend" e "submit_question" criando o método "insert"
+
 ## Funcionalidades
 
 #### Desviar de obstáculos
