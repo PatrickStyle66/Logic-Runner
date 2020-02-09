@@ -1,3 +1,11 @@
+# Refatoramento
+-Implementação do padrão *Introduce Parameter Object* na classe `button`
+
+-implementação do padrão *Extract Class* na classe `text_button` extraída da classe `button`
+
+-implementação do padrão *Extract Method* nas classes `register`,`add_friend` e `submit_question` criando o método `insert()`
+
+
 # Logic Runner
 O jogo consiste em um *Endless Runner*(Gênero de plataforma onde o personagem desvia de obstáculos sem parar até que se esbarre em um mesmo) onde o jogador ao atingir um obstáculo deverá responder questões de lógica de múltipla escolha. Acertando a questão o jogador terá direito a continuar a partida, caso contrário, o jogo se encerra. O jogador contará com *Power-up's*(Itens que ao serem coletados garantem uma vantagem ao jogador) ao longo da partida que o ajudarão a lidar com os obstáculos. Cada personagem selecionável no jogo terá um *Power-up* diferente.
 
@@ -5,12 +13,6 @@ O jogador poderá criar uma conta no jogo para poder registrar pontuações e ad
 
 A proposta do jogo, além de divertir, é estimular o raciocínio lógico.
 
-## Refatoramento
--Implementação do padrão *Introduce Parameter Object* na classe "button"
-
--implementação do padrão *Extract Class* na classe "text_button" extraída da classe "button"
-
--implementação do padrão *Extract Method* nas classes "register","add_friend" e "submit_question" criando o método "insert"
 
 ## Funcionalidades
 
