@@ -98,8 +98,8 @@ def endScreen():
     objects = []
     speed = 60
     imunity = 0
-    tryagain = button((0,255,0), 200,420,250,100,'Reiniciar')
-    back = button((0,255,0),500,420,250,100,'Menu')
+    tryagain = button((0,255,0), 200,420,250,100,std_button('Reiniciar'))
+    back = button((0,255,0),500,420,250,100,std_button('Menu'))
     run = True
     while run:
         pygame.time.delay(100)
@@ -139,10 +139,10 @@ def questionScreen():
     imunity  = 500
     pause = 0
     run = True
-    ButtonA = button((0,255,0),220,350,250,100,'Alternativa A')
-    ButtonB = button((0, 255, 0), 220, 470, 250, 100, 'Alternativa B')
-    ButtonC = button((0,255,0),520,350,250,100,'Alternativa C')
-    ButtonD = button((0, 255, 0), 520, 470, 250, 100, 'Alternativa D')
+    ButtonA = button((0,255,0),220,350,250,100,std_button('Alternativa A'))
+    ButtonB = button((0, 255, 0), 220, 470, 250, 100, std_button('Alternativa B'))
+    ButtonC = button((0,255,0),520,350,250,100,std_button('Alternativa C'))
+    ButtonD = button((0, 255, 0), 520, 470, 250, 100, std_button('Alternativa D'))
     font = pygame.font.SysFont('comicsans',30)
     y = font.get_height()
     if not custom_quest:
@@ -211,7 +211,7 @@ def questionScreen():
 
 def creditScreen():
     run = True
-    back = button((0,255,0),700,25,125 ,50,'Voltar')
+    back = button((0,255,0),700,25,125 ,50,std_button('Voltar'))
     font = pygame.font.SysFont('comicsans', 30)
     prog = font.render('Programação geral:',1,(255,255,255))
     patrick = font.render('-Jonathas Patrick H. de Azevedo | jpha@ic.ufal.br',1,(255,255,255))
@@ -261,10 +261,10 @@ def player_choose():
     dummy_im = pygame.image.load(os.path.join('images','dummyS5.png'))
     pygame.display.update()
     run = True
-    logic = button((255,255,255),200,150,150,300,'',5)
-    dummy = button((255,255,255),400,150,150,300,'',5)
-    baldu = button((255,255,255),600,150,150,300,'Em Breve',5,30)
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    logic = button((255,255,255),200,150,150,300,std_button('',5))
+    dummy = button((255,255,255),400,150,150,300,std_button('',5))
+    baldu = button((255,255,255),600,150,150,300,std_button('Em Breve',5,30))
+    back = button((0, 255, 0), 700, 25, 125, 50, std_button('Voltar'))
     font = pygame.font.SysFont('comicsans',50)
     runfont = pygame.font.SysFont('comicsans',30)
     choose = font.render('Escolha o personagem',1,(255,255,255))
@@ -291,28 +291,28 @@ def player_choose():
             pos = pygame.mouse.get_pos()
 
             if logic.isOver(pos):
-                logic = button((0, 255, 0), 200, 150, 150, 300, '', 5)
+                logic = button((0, 255, 0), 200, 150, 150, 300,std_button( '', 5))
                 logic.draw(win, (0, 0, 0))
                 logic_im = pygame.image.load(os.path.join('images', '4.png'))
                 power = logicfun
                 param = logicup
                 pygame.display.update()
             else:
-                logic = button((255, 255, 255), 200, 150, 150, 300, '', 5)
+                logic = button((255, 255, 255), 200, 150, 150, 300,std_button( '', 5))
                 logic.draw(win, (0, 0, 0))
                 logic_im = pygame.image.load(os.path.join('images', 'S5.png'))
                 win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
                 pygame.display.update()
 
             if dummy.isOver(pos):
-                dummy = button((0, 255, 0), 400, 150, 150, 300, '', 5)
+                dummy = button((0, 255, 0), 400, 150, 150, 300,std_button( '', 5))
                 dummy.draw(win, (0, 0, 0))
                 dummy_im = pygame.image.load(os.path.join('images', 'dummy4.png'))
                 power = dummyfun
                 param = dummyup
                 pygame.display.update()
             else:
-                dummy = button((255, 255, 255), 400, 150, 150, 300, '', 5)
+                dummy = button((255, 255, 255), 400, 150, 150, 300, std_button( '', 5))
                 dummy.draw(win, (0, 0, 0))
                 dummy_im = pygame.image.load(os.path.join('images', 'dummyS5.png'))
 
@@ -320,13 +320,13 @@ def player_choose():
                 pygame.display.update()
 
             if baldu.isOver(pos):
-                baldu = button((0, 255, 0), 600, 150, 150, 300, 'Em breve', 5,30,(255,255,255))
+                baldu = button((0, 255, 0), 600, 150, 150, 300, std_button('Em breve', 5,30,(255,255,255)))
                 baldu.draw(win, (0, 0, 0))
                 power = baldufun
                 param = baldup
                 pygame.display.update()
             else:
-                baldu = button((255, 255, 255), 600, 150, 150, 300, 'Em breve', 5,30,(255,255,255))
+                baldu = button((255, 255, 255), 600, 150, 150, 300, std_button('Em breve', 5,30,(255,255,255)))
                 baldu.draw(win, (0, 0, 0))
 
                 win.blit(blank, (W / 2 - blank.get_width() / 2, 550))
@@ -366,7 +366,7 @@ def rank_menu():
     font = pygame.font.SysFont('comicsans', 30)
     titlefont = pygame.font.Font('Minecrafter.Alt.ttf', 50)
     title = titlefont.render('RAnking', 1, (255, 255, 255))
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    back = button((0, 255, 0), 700, 25, 125, 50, std_button('Voltar'))
     background = pygame.image.load(os.path.join('images', 'fundo.png'))
     user_font = pygame.font.SysFont('comicsans', 30)
     blits = []
@@ -422,7 +422,7 @@ def friends_list():
     font = pygame.font.SysFont('comicsans', 30)
     titlefont = pygame.font.Font('Minecrafter.Alt.ttf',50)
     title = titlefont.render('Amigos',1,(255,255,255))
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    back = button((0, 255, 0), 700, 25, 125, 50,std_button('Voltar'))
     background = pygame.image.load(os.path.join('images', 'fundo.png'))
     user_font = pygame.font.SysFont('comicsans', 30)
     blits = []
@@ -438,7 +438,7 @@ def friends_list():
         friend = font.render(request[0], 1, (255, 255, 255))
         blits.append(friend)
         users.append(request[0])
-        decbutton = button((255, 0, 0), 600, y, 20, 20, 'X', 0, 30, (255, 255, 255))
+        decbutton = button((255, 0, 0), 600, y, 20, 20, std_button('X', 0, 30, (255, 255, 255)))
         decline.append(decbutton)
         height.append(y)
         y += font.get_height() + 10
@@ -493,7 +493,7 @@ def request_list():
     cursor = cnx.cursor()
     run = True
     font = pygame.font.SysFont('comicsans',30)
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
+    back = button((0, 255, 0), 700, 25, 125, 50, std_button('Voltar'))
     background = pygame.image.load(os.path.join('images', 'fundo.png'))
     user_font = pygame.font.SysFont('comicsans', 30)
     titlefont = pygame.font.SysFont('comicsans',50)
@@ -512,8 +512,8 @@ def request_list():
         friend = font.render(request[0], 1, (255, 255, 255))
         blits.append(friend)
         users.append(request[0])
-        accbutton = button((0,255,0),570,y,20,20,'√',0,30,(255,255,255))
-        decbutton = button((255,0,0),600,y,20,20,'X',0,30,(255,255,255))
+        accbutton = button((0,255,0),570,y,20,20,std_button('√',0,30,(255,255,255)))
+        decbutton = button((255,0,0),600,y,20,20,std_button('X',0,30,(255,255,255)))
         accept.append(accbutton)
         decline.append(decbutton)
         height.append(y)
@@ -578,11 +578,11 @@ def friends_menu():
     global user,custom_quest
     run = True
     font = pygame.font.Font('Minecrafter.Alt.ttf', 50)
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
-    friendlist = button((0,255,0),350,155,250,75,'Lista de Amigos',0,40)
-    request = button((0,255,0),350,255,250,75,'Solicitações')
-    add = button((0, 255, 0), 350, 355, 250, 75, 'Adicionar Amigo',0,40)
-    custom = button((0,255,0),350,455,250,75,'Enviar Questões',0,40)
+    back = button((0, 255, 0), 700, 25, 125, 50, std_button('Voltar'))
+    friendlist = button((0,255,0),350,155,250,75,std_button('Lista de Amigos',0,40))
+    request = button((0,255,0),350,255,250,75,std_button('Solicitações'))
+    add = button((0, 255, 0), 350, 355, 250, 75, std_button('Adicionar Amigo',0,40))
+    custom = button((0,255,0),350,455,250,75,std_button('Enviar Questões',0,40))
     title = font.render('Amigos',1,(255,255,255))
     user_font = pygame.font.SysFont('comicsans', 30)
     cust_font = user_font.render('Quest. customizadas:',1,(255,255,255))
@@ -604,11 +604,11 @@ def friends_menu():
         friendlist.draw(win,(0,0,0))
         custom.draw(win,(0,0,0))
         if custom_quest and blit:
-            cust_button = button((0,255,0),830,550,75,30,'Sim',0,30,(255,255,255))
+            cust_button = button((0,255,0),830,550,75,30,std_button('Sim',0,30,(255,255,255)))
             cust_button.draw(win,(0,0,0))
 
         elif blit:
-            cust_button = button((255, 0, 0), 830, 550, 75, 30, 'Não', 0, 30, (255, 255, 255))
+            cust_button = button((255, 0, 0), 830, 550, 75, 30, std_button('Não', 0, 30, (255, 255, 255)))
             cust_button.draw(win, (0, 0, 0))
 
         pygame.display.update()
@@ -656,27 +656,27 @@ def acc_menu():
     font = pygame.font.Font('Minecrafter.Alt.ttf',50)
     user_font = pygame.font.SysFont('comicsans',30)
     acc = font.render('ContA',1,(255,255,255))
-    back = button((0, 255, 0), 700, 25, 125, 50, 'Voltar')
-    sign_up = button((0, 255, 0), 0, 0, 250, 75, 'Registrar-se')
-    sign_in = button((0, 255, 0), 0, 0, 250, 75, 'Login')
-    friends = button((0, 255, 0), 0, 0, 250, 75, 'Amigos')
-    log_out = button((0, 255, 0), 0, 0, 250, 75, 'Desconectar')
-    delete = button((0, 255, 0), 0, 0, 250, 75, 'Apagar conta')
+    back = button((0, 255, 0), 700, 25, 125, 50, std_button('Voltar'))
+    sign_up = button((0, 255, 0), 0, 0, 250, 75, std_button('Registrar-se'))
+    sign_in = button((0, 255, 0), 0, 0, 250, 75, std_button('Login'))
+    friends = button((0, 255, 0), 0, 0, 250, 75, std_button('Amigos'))
+    log_out = button((0, 255, 0), 0, 0, 250, 75, std_button('Desconectar'))
+    delete = button((0, 255, 0), 0, 0, 250, 75, std_button('Apagar conta'))
 
     while run:
         pygame.time.delay(50)
         back.draw(win,(0,0,0))
         if user != '':
-            friends = button((0, 255, 0), 350, 155, 250, 75, 'Amigos')
-            log_out = button((0, 255, 0), 350, 255, 250, 75, 'Desconectar')
-            delete = button((0, 255, 0), 350, 355, 250, 75, 'Apagar conta')
+            friends = button((0, 255, 0), 350, 155, 250, 75,std_button('Amigos'))
+            log_out = button((0, 255, 0), 350, 255, 250, 75, std_button('Desconectar'))
+            delete = button((0, 255, 0), 350, 355, 250, 75, std_button('Apagar conta'))
             log_out.draw(win,(0,0,0))
             friends.draw(win,(0,0,0))
             delete.draw(win,(0,0,0))
 
         else:
-            sign_up = button((0, 255, 0), 350, 155, 250, 75, 'Registrar-se')
-            sign_in = button((0, 255, 0), 350, 255, 250, 75, 'Login')
+            sign_up = button((0, 255, 0), 350, 155, 250, 75, std_button('Registrar-se'))
+            sign_in = button((0, 255, 0), 350, 255, 250, 75, std_button('Login'))
             sign_in.draw(win,(0,0,0))
             sign_up.draw(win, (0, 0, 0))
         pygame.display.update()
@@ -723,10 +723,10 @@ def acc_menu():
 def menu():
     global state,user
     run = True
-    start = button((0,255,0),350,175,250,75,'Jogar')
-    account = button((0,255,0),350,275,250,75,'Conta')
-    ranking = button((0,255,0),350,375,250,75,'Ranking')
-    credit = button((0,255,0),350,475,250,75,'Créditos')
+    start = button((0,255,0),350,175,250,75,std_button('Jogar'))
+    account = button((0,255,0),350,275,250,75,std_button('Conta'))
+    ranking = button((0,255,0),350,375,250,75,std_button('Ranking'))
+    credit = button((0,255,0),350,475,250,75,std_button('Créditos'))
     font = pygame.font.Font('Minecrafter.Alt.ttf',100)
     soundfont = pygame.font.SysFont('comicsans',30)
     sound1 = soundfont.render('Som(M):On',1,(255,255,255))

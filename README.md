@@ -5,6 +5,8 @@ O jogador poderá criar uma conta no jogo para poder registrar pontuações e ad
 
 A proposta do jogo, além de divertir, é estimular o raciocínio lógico.
 
+## Refatoramento
+-Implementação do padrão *Introduce Parameter Object* na classe "button"
 ## Funcionalidades
 
 #### Desviar de obstáculos

@@ -180,27 +180,34 @@ class spike(saw):
         return False
 
 
+class std_button():
+    def __init__(self,text = '',filled=0,fontScale= 50,colorFont = (0,0,0)):
+        self.filled = filled
+        self.fontScale = fontScale
+        self.colorFont = colorFont
+        self.text = text
+
+#A Classe implementa o padrão Introduce Parameter Object
 class button():
-    def __init__(self, color, x, y, width, height, text='',filled=0,fontScale= 50,colorFont = (0,0,0)):
+
+    def __init__(self, color, x, y, width, height, std):
         self.color = color
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.text = text
-        self.filled = filled
-        self.fontScale = fontScale
-        self.colorFont = colorFont
+        self.std = std
+
     def draw(self, win, outline=None):
 
         if outline:
-            pygame.draw.rect(win, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), self.filled)
+            pygame.draw.rect(win, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), self.std.filled)
 
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), self.filled)
+        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), self.std.filled)
 
-        if self.text != '':
-            font = pygame.font.SysFont('comicsans', self.fontScale)
-            text = font.render(self.text, 1, self.colorFont)
+        if self.std.text != '':
+            font = pygame.font.SysFont('comicsans', self.std.fontScale)
+            text = font.render(self.std.text, 1, self.std.colorFont)
             win.blit(text, (
             self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
 
